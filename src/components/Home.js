@@ -11,6 +11,9 @@ function Home() {
             <button className="btn btn-primary mb-2" onClick={() => navigate('/adduser')}>
                 ไปหน้าเพิ่มผู้ใช้
             </button>
+             <button className="btn btn-primary mb-2" onClick={() => navigate('/addticket')}>
+                addticket
+            </button>
         </div>
     );
 }

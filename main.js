@@ -13,7 +13,7 @@ function createWindow() {
     }
   });
 
-  win.loadURL('http://localhost:3000');
+  win.loadURL('http://localhost:3000'); // Test GitHub Pages URL
 }
 
 const db = new sqlite3.Database('./mydb.sqlite', (err) => {
@@ -23,12 +23,20 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
     console.log('Connected to SQLite database.');
     // สร้างตาราง users ถ้ายังไม่มี
     db.run(`
-          CREATE TABLE IF NOT EXISTS "users" (
-	        "id"	INTEGER,
-	        "name"	TEXT NOT NULL,
-	        "tel"	TEXT,
-	        PRIMARY KEY("id" AUTOINCREMENT)
-        )
+      CREATE TABLE IF NOT EXISTS "users" (
+        "id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+        "name"	TEXT NOT NULL,
+        "tel"	TEXT
+      )
+    `);
+
+    // สร้างตาราง add ถ้ายังไม่มี
+    db.run(`
+      CREATE TABLE IF NOT EXISTS "ticket" (
+        "id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+        "naneticket" TEXT NOT NULL,
+        "created_date" DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
     `);
   }
 });
@@ -39,6 +47,16 @@ ipcMain.handle('add-user', async (event, name,phone) => {
     db.run('INSERT INTO users (name,tel) VALUES (?,?)', [name,phone], function (err) {
       if (err) reject(err);
       else resolve({ id: this.lastID, name, phone: phone });
+    });
+  });
+});
+
+ipcMain.handle('add-ticket', async (event, naneticket, create_at) => {
+  const vardate = create_at || new Date().toISOString();
+  return new Promise((resolve, reject) => {
+    db.run('INSERT INTO ticket (naneticket,created_date) VALUES (?, ?)', [naneticket, create_at], function (err) {
+      if (err) reject(err);
+      else resolve({ id: this.lastID, naneticket, created_date : vardate });
     });
   });
 });
